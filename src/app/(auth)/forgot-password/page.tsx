@@ -10,14 +10,6 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col px-6 py-8 text-white">
-      {/* Back button at the top */}
-      <div
-        className="text-sm mb-4 cursor-pointer"
-        onClick={() => router.back()}
-      >
-        ← Back
-      </div>
-
       {/* Content wrapper to center the card */}
       <div className="flex-grow flex items-center justify-center">
         <Card className="bg-[#1a1a1a] text-white w-full max-w-sm mx-auto rounded-2xl">

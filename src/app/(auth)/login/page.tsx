@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import F1Car from "../../assets/f1-car.svg";
-import Gmail from "../../assets/gmail-icon.svg";
+import F1Car from "../../../assets/f1-car.svg";
+import Gmail from "../../../assets/gmail-icon.svg";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -58,7 +58,10 @@ export default function LoginPage() {
             account
           </p>
 
-          <Button className="bg-red-600 hover:bg-red-700 w-full mb-4 cursor-pointer">
+          <Button
+            className="bg-red-600 hover:bg-red-700 w-full mb-4 cursor-pointer"
+            onClick={() => router.push("/login/email-login")}
+          >
             Continue with Email
           </Button>
 
