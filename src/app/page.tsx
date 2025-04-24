@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import F1Car from "../assets/f1-car.svg";
+import { useUser } from "@/hooks/useUser";
 
 const slides = [
   {
@@ -27,6 +28,13 @@ const slides = [
 export default function Onboarding() {
   const [active, setActive] = useState(0);
   const router = useRouter();
+  const { isLoggedIn } = useUser();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace("/content");
+    }
+  }, [isLoggedIn, router]);
 
   const handleNext = () => {
     if (active < slides.length - 1) {
