@@ -32,7 +32,6 @@ export default function NewPost() {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col h-[100dvh] pt-16 pb-24 px-4 bg-black text-white overflow-y-auto"
     >
-      {/* User Info */}
       <div className="flex items-start gap-3 mb-4">
         <div className="w-10 h-10 rounded-full overflow-hidden">
           <Image
@@ -50,8 +49,6 @@ export default function NewPost() {
           </div>
         </div>
       </div>
-
-      {/* Text Area */}
       <textarea
         {...register('content')}
         placeholder="Start a post..."
@@ -62,7 +59,6 @@ export default function NewPost() {
         <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>
       )}
 
-      {/* Post Button (shadcn) */}
       <div className="mt-auto pt-4">
         <Button type="submit" className="w-full bg-white text-black font-semibold">
           Post
