@@ -99,7 +99,7 @@ function UserIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 const navItems = [
-  { href: "/", icon: HomeIcon, label: "Home" },
+  { href: "/content", icon: HomeIcon, label: "Home" },
   { href: "/search", icon: SearchIcon, label: "Search" },
   { href: "content/create-post", icon: PlusCircleIcon, label: "Post" },
   { href: "/favorites", icon: HeartIcon, label: "Favorites" },
