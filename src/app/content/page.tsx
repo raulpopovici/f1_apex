@@ -2,21 +2,9 @@
 
 import { PostCard } from "../../components/post-card";
 import ferrari from "../../assets/ferrari.svg";
-import formula2 from "../../assets/formula2.jpg";
 
 export default function FeedPage() {
   const posts = [
-    {
-      avatarUrl: ferrari,
-      username: "@scuderiaferrari",
-      isVerified: true,
-      timestamp: "12m",
-      content: "Chinese Grand Prix time 🇨🇳🏁 Let’s keep pushing!",
-      imageUrl: formula2,
-      likes: 23800,
-      replies: 942,
-      liked: false,
-    },
     {
       avatarUrl: ferrari,
       username: "@scuderiaferrari",
@@ -28,17 +16,7 @@ export default function FeedPage() {
       replies: 512,
       liked: true,
     },
-    {
-      avatarUrl: ferrari,
-      username: "@scuderiaferrari",
-      isVerified: true,
-      timestamp: "2h",
-      content: "Ready to dominate the next lap. 💪🔥",
-      imageUrl: formula2,
-      likes: 29900,
-      replies: 1188,
-      liked: false,
-    },
+
     {
       avatarUrl: ferrari,
       username: "@scuderiaferrari",
@@ -68,28 +46,6 @@ export default function FeedPage() {
       timestamp: "5h",
       content: "Behind every lap, there’s a team giving it all. ❤️",
       imageUrl: undefined,
-      likes: 9200,
-      replies: 331,
-      liked: false,
-    },
-    {
-      avatarUrl: ferrari,
-      username: "@scuderiaferrari",
-      isVerified: true,
-      timestamp: "5h",
-      content: "Behind every lap, there’s a team giving it all. ❤️",
-      imageUrl: formula2,
-      likes: 9200,
-      replies: 331,
-      liked: false,
-    },
-    {
-      avatarUrl: ferrari,
-      username: "@scuderiaferrari",
-      isVerified: true,
-      timestamp: "5h",
-      content: "Behind every lap, there’s a team giving it all. ❤️",
-      imageUrl: formula2,
       likes: 9200,
       replies: 331,
       liked: false,
