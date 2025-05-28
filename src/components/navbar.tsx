@@ -103,7 +103,7 @@ const navItems = [
   { href: "/search", icon: SearchIcon, label: "Search" },
   { href: "content/create-post", icon: PlusCircleIcon, label: "Post" },
   { href: "/favorites", icon: HeartIcon, label: "Favorites" },
-  { href: "/profile", icon: UserIcon, label: "Profile" },
+  { href: "/content/profile", icon: UserIcon, label: "Profile" },
 ];
 
 export default function ResponsiveNavbar() {

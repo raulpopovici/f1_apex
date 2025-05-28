@@ -2,6 +2,8 @@
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { VerifiedCheckIcon } from "./icons/verified-icon";
 
 export function ChatIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -100,10 +102,15 @@ export function PostCard({
     },
   ]);
 
+  const router = useRouter();
+  const handleAvatarClick = () => {
+    router.push(`/content/team-profile`);
+  };
+
   return (
-    <div className="flex px-4 py-6 gap-4 border-b border-gray-800">
+    <div className="flex px-4 py-6 gap-4 border-b border-gray-800 cursor-pointer hover:bg-gray-800 transition-colors">
       {/* Avatar */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0" onClick={() => handleAvatarClick()}>
         <Image
           src={avatarUrl}
           alt="avatar"
@@ -119,7 +126,9 @@ export function PostCard({
         <div className="flex justify-between items-center font-semibold text-sm">
           <div className="flex items-center gap-2">
             <span>{username}</span>
-            {isVerified && <span className="text-blue-500">✔️</span>}
+            {isVerified && (
+              <VerifiedCheckIcon className="w-4 h-4 text-red-500" />
+            )}
           </div>
           <span className="text-xs text-gray-400">{timestamp}</span>
         </div>
@@ -145,7 +154,11 @@ export function PostCard({
           {/* Comment */}
           <div
             className="flex items-center gap-1 cursor-pointer hover:text-blue-400"
-            onClick={() => setCommentsOpen(!commentsOpen)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setCommentsOpen(!commentsOpen);
+            }}
           >
             <ChatIcon className="w-4 h-4" />
             <span>{replies} replies</span>
@@ -217,7 +230,7 @@ export function PostCard({
                   className="w-full bg-gray-800 text-white px-3 py-2 rounded-md outline-none placeholder:text-gray-400"
                 />
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
                     if (newComment.trim()) {
                       const newEntry: Comment = {
                         text: newComment.trim(),

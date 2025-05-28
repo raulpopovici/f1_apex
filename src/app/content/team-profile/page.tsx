@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -36,10 +36,6 @@ const posts = [
 export default function TeamProfilePage() {
   return (
     <div className="bg-black text-white min-h-screen pt-16 pb-24 px-4">
-      <div className="flex justify-between items-start mb-4">
-        <div className="text-sm">&lt; Back</div>
-        <EllipsisIcon className="w-5 h-5 text-white" />
-      </div>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Scuderia Ferrari</h1>
