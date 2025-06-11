@@ -11,11 +11,13 @@ interface NotificationPayload {
 interface UseNotificationsProps {
   apiBaseUrl: string;
   accessToken?: string;
+  userRole?: "user" | "driver" | "team";
 }
 
 export const useNotifications = ({
   apiBaseUrl,
   accessToken,
+  userRole,
 }: UseNotificationsProps) => {
   const [connection, setConnection] = useState<signalR.HubConnection | null>(
     null
@@ -34,15 +36,19 @@ export const useNotifications = ({
 
     hubConnection.on("ReceiveNotification", (payload: NotificationPayload) => {
       setNotifications((prev) => [payload, ...prev]);
-      toast(payload.title, {
-        description: payload.body,
-        duration: 5000,
-        icon: "🏁",
-        action: {
-          label: "Dismiss",
-          onClick: () => {},
-        },
-      });
+
+      // Only show toast notifications for regular users
+      if (userRole === "user") {
+        toast(payload.title, {
+          description: payload.body,
+          duration: 5000,
+          icon: "🏁",
+          action: {
+            label: "Dismiss",
+            onClick: () => {},
+          },
+        });
+      }
     });
 
     hubConnection.onclose(() => setIsConnected(false));
@@ -53,7 +59,7 @@ export const useNotifications = ({
     return () => {
       hubConnection.stop();
     };
-  }, [apiBaseUrl, accessToken]);
+  }, [apiBaseUrl, accessToken, userRole]);
 
   const connect = useCallback(async () => {
     if (

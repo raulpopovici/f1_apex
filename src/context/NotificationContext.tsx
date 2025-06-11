@@ -6,6 +6,7 @@ import { useNotifications } from "../hooks/useNotifications";
 interface UserDto {
   favoriteTeams: string[];
   favoriteDrivers: string[];
+  role?: "user" | "driver" | "team";
 }
 
 interface NotificationContextType {
@@ -31,7 +32,11 @@ export const NotificationProvider = ({
   accessToken,
   user,
 }: NotificationProviderProps) => {
-  const notificationService = useNotifications({ apiBaseUrl, accessToken });
+  const notificationService = useNotifications({
+    apiBaseUrl,
+    accessToken,
+    userRole: user?.role,
+  });
 
   useEffect(() => {
     const initializeNotifications = async () => {

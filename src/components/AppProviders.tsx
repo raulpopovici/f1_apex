@@ -11,8 +11,9 @@ function NotificationWrapper({ children }: { children: ReactNode }) {
   // Convert user data to format expected by NotificationProvider
   const userData = user
     ? {
-        favoriteTeams: ["Ferrari", "Mercedes", "McLaren"], // Hardcoded for demo
-        favoriteDrivers: ["44", "16", "81"], // Hardcoded for demo - Lewis, Charles, Oscar
+        favoriteTeams: user.favoriteTeams,
+        favoriteDrivers: user.favoriteDrivers,
+        role: user.role,
       }
     : undefined;
 

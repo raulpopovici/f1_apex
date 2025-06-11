@@ -1,5 +1,5 @@
 import { BackButton } from "@/components/back-button";
-import ResponsiveNavbar from "@/components/navbar";
+import RoleBasedNavbar from "@/components/RoleBasedNavbar";
 import { Toaster } from "sonner";
 
 export default function ContentLayout({
@@ -10,12 +10,12 @@ export default function ContentLayout({
   return (
     <div className="w-full max-w-md mx-auto">
       <BackButton />
-      <ResponsiveNavbar />
+      <RoleBasedNavbar />
       {children}
       <Toaster
         theme="dark" // Ensures dark colors are preferred
         position="top-right"
-        richColors={false} // ✅ MOST IMPORTANT: disables sonner’s bright defaults
+        richColors={false} // ✅ MOST IMPORTANT: disables sonner's bright defaults
         toastOptions={{
           duration: 5000,
           classNames: {
