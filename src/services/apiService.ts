@@ -15,6 +15,18 @@ export interface UserDto {
   likedPostIds: string[];
 }
 
+export interface LoginDto {
+  Email: string;
+  Password: string;
+}
+
+export interface RegisterUserDto {
+  FullName: string;
+  Email: string;
+  Password: string;
+  Role: string;
+}
+
 class ApiService {
   private async request<T>(
     endpoint: string,
@@ -34,7 +46,10 @@ class ApiService {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
       }
 
       // For 204 No Content responses (like PUT requests), return empty object
@@ -47,6 +62,37 @@ class ApiService {
       console.error(`API request failed: ${endpoint}`, error);
       throw error;
     }
+  }
+
+  async login(email: string, password: string): Promise<UserDto> {
+    const loginDto: LoginDto = {
+      Email: email,
+      Password: password,
+    };
+
+    return this.request<UserDto>("/users/login", {
+      method: "POST",
+      body: JSON.stringify(loginDto),
+    });
+  }
+
+  async register(
+    fullName: string,
+    email: string,
+    password: string,
+    role: string = "user"
+  ): Promise<UserDto> {
+    const registerDto: RegisterUserDto = {
+      FullName: fullName,
+      Email: email,
+      Password: password,
+      Role: role,
+    };
+
+    return this.request<UserDto>("/users/register", {
+      method: "POST",
+      body: JSON.stringify(registerDto),
+    });
   }
 
   async updateFavorites(

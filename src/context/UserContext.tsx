@@ -21,6 +21,12 @@ export type UserContextType = {
   isTeam: boolean;
   isRegularUser: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (
+    fullName: string,
+    email: string,
+    password: string,
+    role?: string
+  ) => Promise<boolean>;
   logout: () => void;
   updateFavorites: (
     favoriteTeams: string[],
@@ -37,120 +43,89 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Check if user is already logged in from localStorage
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-    if (isLoggedIn === "true") {
-      // For demo - you can set different roles here for testing
-      const savedRole = localStorage.getItem("userRole") || "user";
-
-      // Set different hardcoded users based on role
-      let hardcodedUser: User;
-
-      if (savedRole === "driver") {
-        hardcodedUser = {
-          userId: "driver-123",
-          username: "lewis_hamilton",
-          role: "driver",
-          favoriteTeams: [],
-          favoriteDrivers: [],
-          repostedPostIds: [],
-          likedPostIds: [],
-          avatarUrl: "/assets/lewis-avatar.jpg",
-        };
-      } else if (savedRole === "team") {
-        hardcodedUser = {
-          userId: "team-ferrari",
-          username: "scuderiaferrari",
-          role: "team",
-          favoriteTeams: [],
-          favoriteDrivers: [],
-          repostedPostIds: [],
-          likedPostIds: [],
-          avatarUrl: "/assets/ferrari-avatar.jpg",
-        };
-      } else {
-        // Use the specific hardcoded user "andreea"
-        hardcodedUser = {
-          userId: "ra0001",
-          username: "andreea",
-          role: "user",
-          favoriteTeams: ["ferrari", "mclaren"], // Using lowercase IDs to match our component
-          favoriteDrivers: ["Hamilton", "Piastri"],
-          repostedPostIds: [],
-          likedPostIds: [],
-          avatarUrl: "/assets/user-avatar.jpg",
-        };
+    const savedUser = localStorage.getItem("currentUser");
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to parse saved user data:", error);
+        localStorage.removeItem("currentUser");
       }
-
-      setUser(hardcodedUser);
     }
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const userData = await apiService.login(email, password);
 
-    // Accept any non-empty email and password for demo purposes
-    if (email.trim() && password.trim()) {
-      // For demo, determine role based on email domain or specific emails
-      let role: "user" | "driver" | "team" = "user";
+      // Convert API response to our User type
+      const user: User = {
+        userId: userData.userId,
+        username: userData.username,
+        role: userData.role as "user" | "driver" | "team",
+        favoriteTeams: userData.favoriteTeams || [],
+        favoriteDrivers: userData.favoriteDrivers || [],
+        repostedPostIds: userData.repostedPostIds || [],
+        likedPostIds: userData.likedPostIds || [],
+        avatarUrl: `/assets/${userData.role}-avatar.jpg`,
+      };
 
-      if (email.includes("@f1.com") || email.includes("driver")) {
-        role = "driver";
-      } else if (email.includes("@team.com") || email.includes("team")) {
-        role = "team";
-      }
+      setUser(user);
 
-      let hardcodedUser: User;
+      // Save user data to localStorage
+      localStorage.setItem("currentUser", JSON.stringify(user));
 
-      if (role === "driver") {
-        hardcodedUser = {
-          userId: "driver-123",
-          username: "lewis_hamilton",
-          role: "driver",
-          favoriteTeams: [],
-          favoriteDrivers: [],
-          repostedPostIds: [],
-          likedPostIds: [],
-          avatarUrl: "/assets/lewis-avatar.jpg",
-        };
-      } else if (role === "team") {
-        hardcodedUser = {
-          userId: "team-ferrari",
-          username: "scuderiaferrari",
-          role: "team",
-          favoriteTeams: [],
-          favoriteDrivers: [],
-          repostedPostIds: [],
-          likedPostIds: [],
-          avatarUrl: "/assets/ferrari-avatar.jpg",
-        };
-      } else {
-        // Use the specific hardcoded user "andreea"
-        hardcodedUser = {
-          userId: "ra0001",
-          username: "andreea",
-          role: "user",
-          favoriteTeams: ["ferrari", "mclaren"], // Using lowercase IDs to match our component
-          favoriteDrivers: ["Hamilton", "Piastri"],
-          repostedPostIds: [],
-          likedPostIds: [],
-          avatarUrl: "/assets/user-avatar.jpg",
-        };
-      }
-
-      setUser(hardcodedUser);
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userRole", role);
+      console.log("Login successful:", user);
       return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
+  };
 
-    return false;
+  const register = async (
+    fullName: string,
+    email: string,
+    password: string,
+    role: string = "user"
+  ): Promise<boolean> => {
+    try {
+      const userData = await apiService.register(
+        fullName,
+        email,
+        password,
+        role
+      );
+
+      // Convert API response to our User type
+      const user: User = {
+        userId: userData.userId,
+        username: userData.username,
+        role: userData.role as "user" | "driver" | "team",
+        favoriteTeams: userData.favoriteTeams || [],
+        favoriteDrivers: userData.favoriteDrivers || [],
+        repostedPostIds: userData.repostedPostIds || [],
+        likedPostIds: userData.likedPostIds || [],
+        avatarUrl: `/assets/${userData.role}-avatar.jpg`,
+      };
+
+      setUser(user);
+
+      // Save user data to localStorage
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      console.log("Registration successful:", user);
+      return true;
+    } catch (error) {
+      console.error("Registration failed:", error);
+      return false;
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userRole");
+    localStorage.removeItem("currentUser");
   };
 
   const updateFavorites = async (
@@ -169,15 +144,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       });
 
       // Update the local user state
-      setUser((prevUser) =>
-        prevUser
-          ? {
-              ...prevUser,
-              favoriteTeams,
-              favoriteDrivers,
-            }
-          : null
-      );
+      const updatedUser = {
+        ...user,
+        favoriteTeams,
+        favoriteDrivers,
+      };
+
+      setUser(updatedUser);
+
+      // Update localStorage
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
 
       console.log("Favorites updated successfully");
     } catch (error) {
@@ -195,6 +171,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         isTeam: user?.role === "team",
         isRegularUser: user?.role === "user",
         login,
+        register,
         logout,
         updateFavorites,
       }}
