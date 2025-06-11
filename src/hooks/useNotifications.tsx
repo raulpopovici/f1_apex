@@ -24,6 +24,7 @@ export const useNotifications = ({
   );
   const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState<NotificationPayload[]>([]);
+  const connectionRef = useRef<signalR.HubConnection | null>(null);
 
   useEffect(() => {
     const hubConnection = new signalR.HubConnectionBuilder()
@@ -51,42 +52,64 @@ export const useNotifications = ({
       }
     });
 
-    hubConnection.onclose(() => setIsConnected(false));
-    hubConnection.onreconnected(() => setIsConnected(true));
+    hubConnection.onclose(() => {
+      setIsConnected(false);
+      console.log("SignalR connection closed");
+    });
 
+    hubConnection.onreconnected(() => {
+      setIsConnected(true);
+      console.log("SignalR reconnected");
+    });
+
+    connectionRef.current = hubConnection;
     setConnection(hubConnection);
 
     return () => {
-      hubConnection.stop();
+      if (connectionRef.current) {
+        connectionRef.current.stop();
+      }
     };
   }, [apiBaseUrl, accessToken, userRole]);
 
   const connect = useCallback(async () => {
     if (
-      connection &&
-      connection.state === signalR.HubConnectionState.Disconnected
+      connectionRef.current &&
+      connectionRef.current.state === signalR.HubConnectionState.Disconnected
     ) {
       try {
-        await connection.start();
+        console.log("Starting SignalR connection...");
+        await connectionRef.current.start();
         setIsConnected(true);
+        console.log("SignalR connected successfully");
       } catch (error) {
         console.error("Failed to connect to SignalR hub:", error);
+        setIsConnected(false);
       }
     }
-  }, [connection]);
+  }, []);
 
-  const subscribe = useCallback(
-    async (topic: string) => {
-      if (connection && isConnected) {
-        try {
-          await connection.invoke("Subscribe", topic);
-        } catch (error) {
-          console.error(`Failed to subscribe to topic ${topic}:`, error);
-        }
-      }
-    },
-    [connection, isConnected]
-  );
+  const subscribe = useCallback(async (topic: string) => {
+    if (!connectionRef.current) {
+      console.error(`Cannot subscribe to ${topic}: No connection available`);
+      return;
+    }
+
+    if (connectionRef.current.state !== signalR.HubConnectionState.Connected) {
+      console.error(
+        `Cannot subscribe to ${topic}: Connection not in Connected state (current: ${connectionRef.current.state})`
+      );
+      return;
+    }
+
+    try {
+      console.log(`Subscribing to topic: ${topic}`);
+      await connectionRef.current.invoke("Subscribe", topic);
+      console.log(`Successfully subscribed to topic: ${topic}`);
+    } catch (error) {
+      console.error(`Failed to subscribe to topic ${topic}:`, error);
+    }
+  }, []);
 
   const clearNotifications = useCallback(() => {
     setNotifications([]);

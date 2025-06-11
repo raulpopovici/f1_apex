@@ -40,9 +40,22 @@ export const NotificationProvider = ({
 
   useEffect(() => {
     const initializeNotifications = async () => {
+      // First, establish the connection
       await notificationService.connect();
 
-      if (user) {
+      // Wait for connection to be established (with timeout)
+      const maxWaitTime = 5000; // 5 seconds max wait
+      const checkInterval = 100; // check every 100ms
+      let waitTime = 0;
+
+      while (!notificationService.isConnected && waitTime < maxWaitTime) {
+        await new Promise((resolve) => setTimeout(resolve, checkInterval));
+        waitTime += checkInterval;
+      }
+
+      if (user && notificationService.isConnected) {
+        console.log("Starting topic subscriptions for user:", user);
+
         // Auto-subscribe to user's favorite teams
         for (const teamId of user.favoriteTeams) {
           await notificationService.subscribe(teamId);
@@ -59,6 +72,14 @@ export const NotificationProvider = ({
         await notificationService.subscribe("fp3");
         await notificationService.subscribe("qualifying");
         await notificationService.subscribe("race");
+
+        console.log("All topic subscriptions completed");
+      } else if (!notificationService.isConnected) {
+        console.error(
+          "Failed to establish SignalR connection within timeout period"
+        );
+      } else {
+        console.log("Skipping subscriptions - no user provided");
       }
     };
 
