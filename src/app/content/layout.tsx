@@ -1,5 +1,6 @@
 import { BackButton } from "@/components/back-button";
 import ResponsiveNavbar from "@/components/navbar";
+import { Toaster } from "sonner";
 
 export default function ContentLayout({
   children,
@@ -11,6 +12,26 @@ export default function ContentLayout({
       <BackButton />
       <ResponsiveNavbar />
       {children}
+      <Toaster
+        theme="dark" // Ensures dark colors are preferred
+        position="top-right"
+        richColors={false} // ✅ MOST IMPORTANT: disables sonner’s bright defaults
+        toastOptions={{
+          duration: 5000,
+          classNames: {
+            toast: `
+        bg-black text-white 
+        border-2 border-red
+        rounded-xl shadow-xl 
+        animate-in fade-in slide-in-from-top 
+        transition-transform hover:scale-[1.02]
+      `,
+            title: "text-white font-semibold",
+            description: "text-gray-300 text-sm",
+            actionButton: "text-red-400 hover:text-white underline text-xs",
+          },
+        }}
+      />
     </div>
   );
 }

@@ -12,7 +12,7 @@ export type User = {
 export type UserContextType = {
   user: User | null;
   isLoggedIn: boolean;
-  login: (user: User) => void;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 };
 
@@ -24,24 +24,44 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // 🔥 Mocked login for dev
-    const mockUser = {
-      id: "123",
-      name: "Mocked User",
-      email: "mock@example.com",
-      avatarUrl: "23",
-    };
-    setUser(mockUser);
+    // Check if user is already logged in from localStorage
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn === "true") {
+      // Set the hardcoded user
+      const hardcodedUser = {
+        id: "f1-user-123",
+        name: "Lewis Hamilton",
+        email: "lewis.hamilton@f1.com",
+        avatarUrl: "/assets/lewis-avatar.jpg",
+      };
+      setUser(hardcodedUser);
+    }
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const login = async (email: string, password: string): Promise<boolean> => {
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Accept any non-empty email and password for demo purposes
+    if (email.trim() && password.trim()) {
+      const hardcodedUser = {
+        id: "f1-user-123",
+        name: "Lewis Hamilton",
+        email: "lewis.hamilton@f1.com",
+        avatarUrl: "/assets/lewis-avatar.jpg",
+      };
+
+      setUser(hardcodedUser);
+      localStorage.setItem("isLoggedIn", "true");
+      return true;
+    }
+
+    return false;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    localStorage.removeItem("isLoggedIn");
   };
 
   return (
