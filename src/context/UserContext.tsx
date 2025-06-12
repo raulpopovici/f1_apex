@@ -59,7 +59,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       const userData = await apiService.login(email, password);
 
-      // Convert API response to our User type
       const user: User = {
         userId: userData.userId,
         username: userData.username,
@@ -73,7 +72,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
       setUser(user);
 
-      // Save user data to localStorage
       localStorage.setItem("currentUser", JSON.stringify(user));
 
       console.log("Login successful:", user);

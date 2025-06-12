@@ -42,6 +42,24 @@ export function HeartIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+function RepostIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      className="size-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3"
+      />
+    </svg>
+  );
+}
 
 export function HeartIconFilled(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -64,10 +82,12 @@ interface PostCardProps {
   isVerified?: boolean;
   timestamp: string;
   content: string;
-  imageUrl?: string | StaticImageData;
-  likes: number;
+  mediaUrl: string;
+  likes: any;
   replies: number;
   likedPost?: boolean;
+  id: any;
+  reposts: any;
 }
 
 export function PostCard({
@@ -78,12 +98,18 @@ export function PostCard({
   content,
   likes,
   replies,
-  imageUrl,
+  mediaUrl,
   likedPost = false,
+  id,
+  reposts,
 }: PostCardProps) {
   const [liked, setLiked] = useState<boolean>(likedPost ?? false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [likeCount, setLikeCount] = useState<number>(likes.length);
+  const [reposted, setReposted] = useState(false);
+  const [repostCount, setRepostCount] = useState<number>(reposts.length);
+
   const [comments, setComments] = useState<Comment[]>([
     {
       text: "This car is 🔥",
@@ -106,6 +132,51 @@ export function PostCard({
   const handleAvatarClick = () => {
     router.push(`/content/team-profile`);
   };
+
+  const handleLike = async () => {
+    setLiked(true);
+    setLikeCount((prev) => prev + 1);
+
+    try {
+      await fetch(`http://localhost:5047/api/posts/${id}/like`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      setLiked(false);
+      setLikeCount((prev) => prev - 1);
+      console.error("Failed to like post:", error);
+    }
+  };
+
+  const handleRepost = async () => {
+    setReposted(true);
+    setRepostCount((prev) => prev + 1);
+
+    try {
+      await fetch(`http://localhost:5047/api/posts/${id}/repost`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      setReposted(false);
+      setRepostCount((prev) => prev - 1);
+      console.error("Failed to repost:", error);
+    }
+  };
+  function formatTimestamp(iso: string) {
+    const date = new Date(iso);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${pad(date.getHours())}:${pad(date.getMinutes())} on ${pad(
+      date.getDate()
+    )}-${pad(date.getMonth() + 1)}-${date.getFullYear()}`;
+  }
 
   return (
     <div className="flex px-4 py-6 gap-4 border-b border-gray-800 cursor-pointer hover:bg-gray-800 transition-colors">
@@ -130,17 +201,19 @@ export function PostCard({
               <VerifiedCheckIcon className="w-4 h-4 text-red-500" />
             )}
           </div>
-          <span className="text-xs text-gray-400">{timestamp}</span>
+          <span className="text-xs text-gray-400">
+            {formatTimestamp(timestamp)}
+          </span>
         </div>
 
         {/* Text */}
         <p className="text-sm text-white">{content}</p>
 
         {/* Image */}
-        {imageUrl && (
+        {mediaUrl && (
           <div className="rounded-xl overflow-hidden">
             <Image
-              src={imageUrl}
+              src={mediaUrl}
               alt="post image"
               width={500}
               height={300}
@@ -167,14 +240,27 @@ export function PostCard({
           {/* Like */}
           <div
             className="flex items-center gap-1 cursor-pointer hover:text-red-500 transition-colors"
-            onClick={() => setLiked(!liked)}
+            onClick={() => {
+              if (!liked) handleLike();
+            }}
           >
             {liked ? (
               <HeartIconFilled className="w-4 h-4 text-red-500" />
             ) : (
               <HeartIcon className="w-4 h-4" />
             )}
-            <span>{liked ? likes + 1 : likes} likes</span>
+            <span>{likeCount} likes</span>
+          </div>
+          <div
+            className={`flex items-center gap-1 cursor-pointer hover:text-green-500 transition-colors ${
+              reposted ? "text-green-500" : ""
+            }`}
+            onClick={() => {
+              if (!reposted) handleRepost();
+            }}
+          >
+            <RepostIcon className="w-4 h-4" />
+            <span>{repostCount} reposts</span>
           </div>
         </div>
 

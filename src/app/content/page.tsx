@@ -1,9 +1,26 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import { PostCard } from "../../components/post-card";
 import ferrari from "../../assets/ferrari.svg";
 
+type PostDto = {
+  id: any;
+  avatarUrl?: string;
+  username: string;
+  isVerified: boolean;
+  timestamp: string;
+  content: string;
+  MediaUrl?: string;
+  likes: number;
+  replies: number;
+  liked: boolean;
+  mediaUrl: any;
+  reposts: any;
+};
+
 export default function FeedPage() {
+  const [posts1, setPosts] = useState<PostDto[]>([]);
+  const [loading, setLoading] = useState(true);
   const posts = [
     {
       avatarUrl: ferrari,
@@ -52,6 +69,29 @@ export default function FeedPage() {
     },
   ];
 
+  useEffect(() => {
+    const fetchFeed = async () => {
+      try {
+        const res = await fetch("http://localhost:5047/api/feed");
+        console.log("res is", res);
+        if (!res.ok) throw new Error("Failed to fetch feed");
+        const data = await res.json();
+        setPosts(
+          data.map((post: PostDto) => ({
+            ...post,
+            avatarUrl: post.avatarUrl || ferrari,
+          }))
+        );
+      } catch (err) {
+        console.error("Error fetching feed:", err);
+        setPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeed();
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="w-full py-4 text-center border-b border-gray-700 sticky top-0 bg-black z-50">
@@ -59,9 +99,25 @@ export default function FeedPage() {
       </div>
 
       <div className="flex flex-col mb-24">
-        {posts.map((post, index) => (
-          <PostCard key={index} {...post} />
-        ))}
+        {loading ? (
+          <div className="text-center py-8">Loading...</div>
+        ) : posts.length === 0 ? (
+          <div className="text-center py-8">No posts found.</div>
+        ) : (
+          posts1.map(
+            (post, index) => (
+              console.log("post is", post),
+              (
+                <PostCard
+                  key={post.id || index}
+                  {...post}
+                  avatarUrl={post.avatarUrl ?? ferrari}
+                  mediaUrl={post.mediaUrl ?? ""}
+                />
+              )
+            )
+          )
+        )}
       </div>
     </div>
   );

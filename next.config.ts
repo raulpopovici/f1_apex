@@ -51,6 +51,16 @@ const withPWA = require("next-pwa")({
 });
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "keeptheapexstorage.blob.core.windows.net",
+        pathname: "/**",
+      },
+    ],
+  },
+};
 
 module.exports = withPWA(nextConfig);

@@ -120,7 +120,6 @@ function BellIcon(props: React.SVGProps<SVGSVGElement>) {
 
 const navItems = [
   { href: "/content", icon: HomeIcon, label: "Home" },
-  { href: "/search", icon: SearchIcon, label: "Search" },
   { href: "content/create-post", icon: PlusCircleIcon, label: "Post" },
   { href: "/content/favourites", icon: HeartIcon, label: "Favourites" },
   {
@@ -153,7 +152,13 @@ export default function ResponsiveNavbar() {
       </nav>
 
       {/* Mobile tab bar */}
-      <nav className="fixed bottom-0 inset-x-0 md:hidden bg-black border-t border-white/10 px-6 py-2 flex justify-between z-50">
+      <nav
+        className="fixed bottom-0 inset-x-0 md:hidden bg-black border-t border-white/10 px-6 py-2 flex justify-between z-50"
+        style={{
+          paddingBottom: "env(safe-area-inset-bottom,24px)",
+          minHeight: "56px",
+        }}
+      >
         {navItems.map(({ href, icon: Icon }) => (
           <Link
             key={href}
